@@ -23,10 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CourierMax.Domain\CourierMax.Domain.csproj" />
-    <ProjectReference Include="..\..\src\CourierMax.Application\CourierMax.Application.csproj" />
-    <ProjectReference Include="..\..\src\CourierMax.Infrastructure\CourierMax.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\src\CourierMax.WebApi\CourierMax.WebApi.csproj" />
+    <ProjectReference Include="..\..\CourierMax\CourierMax.Domain\CourierMax.Domain.csproj" />
+    <ProjectReference Include="..\..\CourierMax\CourierMax.Application\CourierMax.Application.csproj" />
+    <ProjectReference Include="..\..\CourierMax\CourierMax.Infrastructure\CourierMax.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\CourierMax\CourierMax.WebApi\CourierMax.WebApi.csproj" />
   </ItemGroup>
 
 </Project>

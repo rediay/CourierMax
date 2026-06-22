@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.37314.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierMax.WebApi", "src\CourierMax.WebApi\CourierMax.WebApi.csproj", "{AE9B8A2C-9E45-4861-9E02-4914DA55A92D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierMax.WebApi", "CourierMax\CourierMax.WebApi\CourierMax.WebApi.csproj", "{AE9B8A2C-9E45-4861-9E02-4914DA55A92D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CourierMax", "CourierMax", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierMax.Domain", "src\CourierMax.Domain\CourierMax.Domain.csproj", "{7B055009-2F2E-4324-8E1B-0E29FA60BB90}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierMax.Domain", "CourierMax\CourierMax.Domain\CourierMax.Domain.csproj", "{7B055009-2F2E-4324-8E1B-0E29FA60BB90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierMax.Application", "src\CourierMax.Application\CourierMax.Application.csproj", "{03D8C4CE-7F17-4392-B96F-0B5A9BE12299}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierMax.Application", "CourierMax\CourierMax.Application\CourierMax.Application.csproj", "{03D8C4CE-7F17-4392-B96F-0B5A9BE12299}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierMax.Infrastructure", "src\CourierMax.Infrastructure\CourierMax.Infrastructure.csproj", "{6A90AD36-1319-4C15-938D-71C9305CE468}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierMax.Infrastructure", "CourierMax\CourierMax.Infrastructure\CourierMax.Infrastructure.csproj", "{6A90AD36-1319-4C15-938D-71C9305CE468}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CourierMax.Tests", "tests\CourierMax.Tests\CourierMax.Tests.csproj", "{051B9E31-8CC9-4B6D-BE26-6050E7632E02}"
 EndProject

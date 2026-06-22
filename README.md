@@ -27,7 +27,7 @@ Clean Architecture with separate projects for Domain, Application, Infrastructur
 4. Run the application:
 
 ```bash
-cd src/CourierMax.WebApi
+cd CourierMax/CourierMax.WebApi
 dotnet run
 ```
 
