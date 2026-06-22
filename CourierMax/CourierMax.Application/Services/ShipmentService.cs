@@ -1,5 +1,6 @@
 using CourierMax.Application.DTOs;
 using CourierMax.Domain.Entities;
+using CourierMax.Domain.Enums;
 using CourierMax.Domain.Interfaces;
 
 namespace CourierMax.Application.Services;
@@ -38,6 +39,52 @@ public class ShipmentService : IShipmentService
     {
         var shipment = await _shipmentRepository.GetByTrackingCodeAsync(trackingCode);
         return shipment is null ? null : MapToResponse(shipment);
+    }
+
+    public async Task<ShipmentResponse> UpdateStatusAsync(int id, UpdateStatusRequest request)
+    {
+        var shipment = await _shipmentRepository.GetByIdAsync(id);
+        if (shipment is null)
+            throw new KeyNotFoundException($"Shipment with id {id} not found.");
+
+        var newStatus = Enum.Parse<ShipmentStatus>(request.NewStatus, true);
+
+        switch (newStatus)
+        {
+            case ShipmentStatus.ASIGNADO:
+                throw new InvalidOperationException("Use the assign endpoint to assign a shipment.");
+            case ShipmentStatus.EN_TRANSITO:
+                shipment.MarkInTransit(request.ChangedBy);
+                break;
+            case ShipmentStatus.ENTREGADO:
+                shipment.Deliver(request.ChangedBy);
+                break;
+            case ShipmentStatus.CANCELADO:
+                shipment.Cancel(request.Reason ?? string.Empty, request.ChangedBy);
+                break;
+            default:
+                throw new InvalidOperationException($"Cannot transition to status {newStatus}.");
+        }
+
+        await _shipmentRepository.UpdateAsync(shipment);
+        return MapToResponse(shipment);
+    }
+
+    public async Task<IEnumerable<ShipmentHistoryResponse>> GetHistoryAsync(int id)
+    {
+        var shipment = await _shipmentRepository.GetByIdAsync(id);
+        if (shipment is null)
+            throw new KeyNotFoundException($"Shipment with id {id} not found.");
+
+        return shipment.StatusHistories.Select(h => new ShipmentHistoryResponse
+        {
+            Id = h.Id,
+            PreviousStatus = h.PreviousStatus?.ToString(),
+            NewStatus = h.NewStatus.ToString(),
+            ChangedAt = h.ChangedAt,
+            Reason = h.Reason,
+            ChangedBy = h.ChangedBy
+        });
     }
 
     private static ShipmentResponse MapToResponse(Shipment shipment)

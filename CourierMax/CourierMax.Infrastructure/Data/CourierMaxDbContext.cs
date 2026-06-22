@@ -10,6 +10,7 @@ public class CourierMaxDbContext : DbContext
     public CourierMaxDbContext(DbContextOptions<CourierMaxDbContext> options) : base(options) { }
 
     public DbSet<Shipment> Shipments => Set<Shipment>();
+    public DbSet<ShipmentStatusHistory> ShipmentStatusHistories => Set<ShipmentStatusHistory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

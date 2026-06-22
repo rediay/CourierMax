@@ -32,6 +32,9 @@ public class Shipment
     public DateTime CreatedAt { get; private set; }
     public DateTime? UpdatedAt { get; private set; }
 
+    private readonly List<ShipmentStatusHistory> _statusHistories = new();
+    public IReadOnlyCollection<ShipmentStatusHistory> StatusHistories => _statusHistories.AsReadOnly();
+
     private Shipment()
     {
         TrackingCode = null!;
@@ -76,5 +79,56 @@ public class Shipment
         Destination = destination;
         Status = ShipmentStatus.CREADO;
         CreatedAt = DateTime.UtcNow;
+
+        _statusHistories.Add(new ShipmentStatusHistory(0, null, ShipmentStatus.CREADO, "system"));
+    }
+
+    public void Assign(int vehicleId, int driverId, string changedBy)
+    {
+        if (Status != ShipmentStatus.CREADO)
+            throw new InvalidOperationException($"Cannot assign shipment in status {Status}. Must be {ShipmentStatus.CREADO}.");
+
+        VehicleId = vehicleId;
+        DriverId = driverId;
+        TransitionTo(ShipmentStatus.ASIGNADO, changedBy);
+    }
+
+    public void MarkInTransit(string changedBy)
+    {
+        if (Status != ShipmentStatus.ASIGNADO)
+            throw new InvalidOperationException($"Cannot mark as in transit from status {Status}. Must be {ShipmentStatus.ASIGNADO}.");
+
+        TransitionTo(ShipmentStatus.EN_TRANSITO, changedBy);
+    }
+
+    public void Deliver(string changedBy)
+    {
+        if (Status != ShipmentStatus.EN_TRANSITO)
+            throw new InvalidOperationException($"Cannot deliver shipment in status {Status}. Must be {ShipmentStatus.EN_TRANSITO}.");
+
+        TransitionTo(ShipmentStatus.ENTREGADO, changedBy);
+    }
+
+    public void Cancel(string reason, string changedBy)
+    {
+        if (Status == ShipmentStatus.ENTREGADO)
+            throw new InvalidOperationException("Cannot cancel a delivered shipment.");
+
+        if (Status == ShipmentStatus.CANCELADO)
+            throw new InvalidOperationException("Shipment is already cancelled.");
+
+        if (string.IsNullOrWhiteSpace(reason) || reason.Trim().Length < 5)
+            throw new ArgumentException("Cancellation reason must be at least 5 characters.");
+
+        TransitionTo(ShipmentStatus.CANCELADO, changedBy, reason.Trim());
+    }
+
+    private void TransitionTo(ShipmentStatus newStatus, string changedBy, string? reason = null)
+    {
+        var previous = Status;
+        Status = newStatus;
+        UpdatedAt = DateTime.UtcNow;
+
+        _statusHistories.Add(new ShipmentStatusHistory(Id, previous, newStatus, changedBy, reason));
     }
 }
