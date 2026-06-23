@@ -33,7 +33,7 @@ public class Shipment
     public DateTime? UpdatedAt { get; private set; }
 
     private readonly List<ShipmentStatusHistory> _statusHistories = new();
-    public IReadOnlyCollection<ShipmentStatusHistory> StatusHistories => _statusHistories.AsReadOnly();
+    public IReadOnlyCollection<ShipmentStatusHistory> StatusHistories => _statusHistories;
 
     private Shipment()
     {

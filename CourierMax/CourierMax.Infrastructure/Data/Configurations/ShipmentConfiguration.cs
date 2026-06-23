@@ -88,5 +88,7 @@ public class ShipmentConfiguration : IEntityTypeConfiguration<Shipment>
         builder.Property(s => s.CreatedAt).IsRequired();
         builder.Property(s => s.UpdatedAt);
 
+        builder.Metadata.FindNavigation(nameof(Shipment.StatusHistories))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
     }
 }

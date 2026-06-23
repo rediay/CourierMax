@@ -15,18 +15,23 @@ public class ShipmentRepository : IShipmentRepository
 
     public async Task<Shipment?> GetByIdAsync(int id)
     {
-        return await _context.Shipments.FindAsync(id);
+        return await _context.Shipments
+            .Include(s => s.StatusHistories)
+            .FirstOrDefaultAsync(s => s.Id == id);
     }
 
     public async Task<Shipment?> GetByTrackingCodeAsync(string trackingCode)
     {
         return await _context.Shipments
-            .FirstOrDefaultAsync(s => s.TrackingCode.ToString() == trackingCode);
+            .Include(s => s.StatusHistories)
+            .FirstOrDefaultAsync(s => s.TrackingCode.Value == trackingCode);
     }
 
     public async Task<IEnumerable<Shipment>> GetAllAsync()
     {
-        return await _context.Shipments.ToListAsync();
+        return await _context.Shipments
+            .Include(s => s.StatusHistories)
+            .ToListAsync();
     }
 
     public async Task AddAsync(Shipment shipment)
@@ -44,6 +49,6 @@ public class ShipmentRepository : IShipmentRepository
     public async Task<bool> TrackingCodeExistsAsync(string trackingCode)
     {
         return await _context.Shipments
-            .AnyAsync(s => s.TrackingCode.ToString() == trackingCode);
+            .AnyAsync(s => s.TrackingCode.Value == trackingCode);
     }
 }
