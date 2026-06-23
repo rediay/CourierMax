@@ -42,15 +42,8 @@ public class ShipmentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusRequest request)
     {
-        try
-        {
-            var shipment = await _shipmentService.UpdateStatusAsync(id, request);
-            return Ok(shipment);
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound(new { error = $"Shipment with id {id} not found." });
-        }
+        var shipment = await _shipmentService.UpdateStatusAsync(id, request);
+        return Ok(shipment);
     }
 
     [HttpGet("{id}/history")]
@@ -58,14 +51,7 @@ public class ShipmentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetHistory(int id)
     {
-        try
-        {
-            var history = await _shipmentService.GetHistoryAsync(id);
-            return Ok(history);
-        }
-        catch (KeyNotFoundException)
-        {
-            return NotFound(new { error = $"Shipment with id {id} not found." });
-        }
+        var history = await _shipmentService.GetHistoryAsync(id);
+        return Ok(history);
     }
 }

@@ -22,9 +22,10 @@ public class ShipmentRepository : IShipmentRepository
 
     public async Task<Shipment?> GetByTrackingCodeAsync(string trackingCode)
     {
+        var tc = CourierMax.Domain.ValueObjects.TrackingCode.FromString(trackingCode);
         return await _context.Shipments
             .Include(s => s.StatusHistories)
-            .FirstOrDefaultAsync(s => s.TrackingCode.Value == trackingCode);
+            .FirstOrDefaultAsync(s => s.TrackingCode == tc);
     }
 
     public async Task<IEnumerable<Shipment>> GetAllAsync()
@@ -48,7 +49,8 @@ public class ShipmentRepository : IShipmentRepository
 
     public async Task<bool> TrackingCodeExistsAsync(string trackingCode)
     {
+        var tc = CourierMax.Domain.ValueObjects.TrackingCode.FromString(trackingCode);
         return await _context.Shipments
-            .AnyAsync(s => s.TrackingCode.Value == trackingCode);
+            .AnyAsync(s => s.TrackingCode == tc);
     }
 }

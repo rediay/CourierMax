@@ -20,10 +20,26 @@ public class ExceptionHandlingMiddleware
         {
             await _next(context);
         }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Business rule violation");
+            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            context.Response.ContentType = "application/json";
+            var response = new { error = ex.Message };
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+        }
         catch (ArgumentException ex)
         {
             _logger.LogWarning(ex, "Validation error");
             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            context.Response.ContentType = "application/json";
+            var response = new { error = ex.Message };
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
+        }
+        catch (KeyNotFoundException ex)
+        {
+            _logger.LogWarning(ex, "Resource not found");
+            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
             context.Response.ContentType = "application/json";
             var response = new { error = ex.Message };
             await context.Response.WriteAsync(JsonSerializer.Serialize(response));
@@ -33,7 +49,7 @@ public class ExceptionHandlingMiddleware
             _logger.LogError(ex, "An unhandled exception occurred");
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             context.Response.ContentType = "application/json";
-            var response = new { error = "An internal server error occurred" };
+            var response = new { error = "Ocurrió un error inesperado. Intenta de nuevo más tarde." };
             await context.Response.WriteAsync(JsonSerializer.Serialize(response));
         }
     }
