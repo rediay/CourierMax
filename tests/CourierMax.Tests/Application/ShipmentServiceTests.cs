@@ -4,8 +4,10 @@ using CourierMax.Application.DTOs;
 using CourierMax.Application.Services;
 using CourierMax.Domain.Entities;
 using CourierMax.Domain.Enums;
+using CourierMax.Domain.Exceptions;
 using CourierMax.Domain.Interfaces;
 using CourierMax.Domain.ValueObjects;
+using Microsoft.Extensions.Logging;
 
 namespace CourierMax.Tests.Application.Services;
 
@@ -23,7 +25,9 @@ public class ShipmentServiceTests
         _mockVehicleRepo = new Mock<IVehicleRepository>();
         _mockDriverRepo = new Mock<IDriverRepository>();
         _mockCost = new Mock<ICostCalculationService>();
-        _service = new ShipmentService(_mockRepo.Object, _mockVehicleRepo.Object, _mockDriverRepo.Object, _mockCost.Object);
+        _service = new ShipmentService(
+            _mockRepo.Object, _mockVehicleRepo.Object, _mockDriverRepo.Object, _mockCost.Object,
+            Mock.Of<ILogger<ShipmentService>>());
     }
 
     private static Shipment CreateSampleShipment(decimal weightKg = 5, ServiceType serviceType = ServiceType.Estandar) =>
@@ -241,6 +245,23 @@ public class ShipmentServiceTests
         result.Status.Should().Be("CANCELADO");
         vehicle.CurrentWeightKg.Should().Be(0);
         _mockVehicleRepo.Verify(r => r.UpdateAsync(vehicle), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateStatusAsync_CancelDeliveredShipment_ThrowsShipmentStateConflictException()
+    {
+        var shipment = CreateSampleShipment();
+        shipment.Assign(1, 1, "operator", 15000m);
+        shipment.MarkInTransit("operator");
+        shipment.Deliver("operator");
+
+        var request = new UpdateStatusRequest { NewStatus = "CANCELADO", Reason = "Demasiado tarde", ChangedBy = "operator" };
+
+        _mockRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(shipment);
+
+        Func<Task> act = () => _service.UpdateStatusAsync(1, request);
+
+        await act.Should().ThrowAsync<ShipmentStateConflictException>();
     }
 
     [Fact]

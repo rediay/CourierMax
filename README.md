@@ -67,10 +67,19 @@ para cada query sin ganancia real, dado el tamaño del dominio.
   calendario anterior con el SLA por tipo de servicio.
 
 **Manejo de errores centralizado**: `ExceptionHandlingMiddleware` traduce
-excepciones de dominio/aplicación a respuestas HTTP consistentes
-(`400` para validaciones y reglas de negocio violadas, `404` para recursos
-no encontrados, `500` para errores no esperados), evitando duplicar
-try/catch en cada controller.
+excepciones de dominio/aplicación a respuestas HTTP consistentes, evitando
+duplicar try/catch en cada controller:
+- `400 Bad Request` — validaciones de input y reglas de negocio (`ArgumentException`, `InvalidOperationException`)
+- `404 Not Found` — recurso no encontrado (`KeyNotFoundException`)
+- `409 Conflict` — operación incompatible con el estado actual del envío, p. ej. asignar un envío que ya está `ASIGNADO`, o cancelar uno ya `ENTREGADO` (`ShipmentStateConflictException`)
+- `500 Internal Server Error` — cualquier excepción no esperada
+
+**Logging**: además de los `LogWarning`/`LogError` del middleware ante cada
+error, `ShipmentService` registra (`ILogger`, nivel `Information`) los
+eventos de negocio relevantes: creación de envío, asignación a
+vehículo/conductor (con costo calculado), transición de estado, y
+liberación de capacidad del vehículo al cancelar — visibles en consola en
+desarrollo.
 
 ---
 

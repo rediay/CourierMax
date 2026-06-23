@@ -1,5 +1,6 @@
 using CourierMax.Domain.Entities;
 using CourierMax.Domain.Enums;
+using CourierMax.Domain.Exceptions;
 using CourierMax.Domain.ValueObjects;
 using FluentAssertions;
 
@@ -39,7 +40,7 @@ public class ShipmentStatusTests
         var shipment = CreateValidShipment();
         shipment.Assign(1, 1, "operator1", 0);
         Action act = () => shipment.Assign(1, 1, "operator2", 0);
-        act.Should().Throw<InvalidOperationException>();
+        act.Should().Throw<ShipmentStateConflictException>();
     }
 
     [Fact]
@@ -56,7 +57,7 @@ public class ShipmentStatusTests
     {
         var shipment = CreateValidShipment();
         Action act = () => shipment.MarkInTransit("op1");
-        act.Should().Throw<InvalidOperationException>();
+        act.Should().Throw<ShipmentStateConflictException>();
     }
 
     [Fact]
@@ -74,7 +75,7 @@ public class ShipmentStatusTests
     {
         var shipment = CreateValidShipment();
         Action act = () => shipment.Deliver("op1");
-        act.Should().Throw<InvalidOperationException>();
+        act.Should().Throw<ShipmentStateConflictException>();
     }
 
     [Fact]
@@ -112,7 +113,7 @@ public class ShipmentStatusTests
         shipment.MarkInTransit("op1");
         shipment.Deliver("op1");
         Action act = () => shipment.Cancel("Too late", "op1");
-        act.Should().Throw<InvalidOperationException>();
+        act.Should().Throw<ShipmentStateConflictException>();
     }
 
     [Fact]

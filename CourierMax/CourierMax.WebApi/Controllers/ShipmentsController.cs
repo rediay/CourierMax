@@ -50,6 +50,7 @@ public class ShipmentsController : ControllerBase
     [ProducesResponseType(typeof(ShipmentResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Assign(int id, [FromBody] AssignRequest request)
     {
         var shipment = await _shipmentService.AssignAsync(id, request);
@@ -60,6 +61,7 @@ public class ShipmentsController : ControllerBase
     [ProducesResponseType(typeof(ShipmentResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusRequest request)
     {
         var shipment = await _shipmentService.UpdateStatusAsync(id, request);

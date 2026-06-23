@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using CourierMax.Domain.Exceptions;
 
 namespace CourierMax.WebApi.Middleware;
 
@@ -19,6 +20,14 @@ public class ExceptionHandlingMiddleware
         try
         {
             await _next(context);
+        }
+        catch (ShipmentStateConflictException ex)
+        {
+            _logger.LogWarning(ex, "Shipment state conflict");
+            context.Response.StatusCode = (int)HttpStatusCode.Conflict;
+            context.Response.ContentType = "application/json";
+            var response = new { error = ex.Message };
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response));
         }
         catch (InvalidOperationException ex)
         {

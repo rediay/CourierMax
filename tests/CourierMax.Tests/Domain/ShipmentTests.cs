@@ -1,5 +1,6 @@
 using CourierMax.Domain.Entities;
 using CourierMax.Domain.Enums;
+using CourierMax.Domain.Exceptions;
 using CourierMax.Domain.ValueObjects;
 using FluentAssertions;
 
@@ -55,14 +56,14 @@ public class ShipmentTests
     }
 
     [Fact]
-    public void Assign_NotInCreado_ThrowsInvalidOperationException()
+    public void Assign_NotInCreado_ThrowsShipmentStateConflictException()
     {
         var shipment = CreateValidShipment();
         shipment.Assign(1, 2, "operator", 0);
 
         Action act = () => shipment.Assign(3, 4, "operator", 0);
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should().Throw<ShipmentStateConflictException>()
             .WithMessage("*Cannot assign*ASIGNADO*CREADO*");
     }
 

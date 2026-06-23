@@ -5,6 +5,7 @@ using CourierMax.Domain.Interfaces;
 using CourierMax.Domain.Reference;
 using CourierMax.Domain.Services;
 using CourierMax.Domain.ValueObjects;
+using Microsoft.Extensions.Logging;
 
 namespace CourierMax.Application.Services;
 
@@ -14,6 +15,7 @@ public class ShipmentService : IShipmentService
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IDriverRepository _driverRepository;
     private readonly ICostCalculationService _costCalculationService;
+    private readonly ILogger<ShipmentService> _logger;
 
     private const int MaxTrackingCodeGenerationAttempts = 10;
 
@@ -21,12 +23,14 @@ public class ShipmentService : IShipmentService
         IShipmentRepository shipmentRepository,
         IVehicleRepository vehicleRepository,
         IDriverRepository driverRepository,
-        ICostCalculationService costCalculationService)
+        ICostCalculationService costCalculationService,
+        ILogger<ShipmentService> logger)
     {
         _shipmentRepository = shipmentRepository;
         _vehicleRepository = vehicleRepository;
         _driverRepository = driverRepository;
         _costCalculationService = costCalculationService;
+        _logger = logger;
     }
 
     public async Task<ShipmentResponse> CreateAsync(CreateShipmentRequest request)
@@ -55,6 +59,11 @@ public class ShipmentService : IShipmentService
             trackingCode);
 
         await _shipmentRepository.AddAsync(shipment);
+
+        _logger.LogInformation(
+            "Shipment {TrackingCode} created ({Origin} -> {Destination}, {ServiceType}, {PackageType}, {WeightKg}kg)",
+            shipment.TrackingCode, shipment.Origin, shipment.Destination,
+            shipment.ServiceType, shipment.PackageType, shipment.PackageWeight.Kg);
 
         return MapToResponse(shipment);
     }
@@ -115,6 +124,10 @@ public class ShipmentService : IShipmentService
         await _shipmentRepository.UpdateAsync(shipment);
         await _vehicleRepository.UpdateAsync(vehicle);
 
+        _logger.LogInformation(
+            "Shipment {TrackingCode} assigned to driver {DriverId} / vehicle {Plate} by {ChangedBy} (cost: {TotalCost})",
+            shipment.TrackingCode, driver.Id, vehicle.Plate, request.ChangedBy, cost.TotalCost);
+
         return MapToResponse(shipment);
     }
 
@@ -156,6 +169,11 @@ public class ShipmentService : IShipmentService
         }
 
         await _shipmentRepository.UpdateAsync(shipment);
+
+        _logger.LogInformation(
+            "Shipment {TrackingCode} transitioned to {NewStatus} by {ChangedBy}",
+            shipment.TrackingCode, shipment.Status, request.ChangedBy);
+
         return MapToResponse(shipment);
     }
 
@@ -201,6 +219,10 @@ public class ShipmentService : IShipmentService
             {
                 vehicle.ReleaseCargo(weightKg, volumeM3);
                 await _vehicleRepository.UpdateAsync(vehicle);
+
+                _logger.LogInformation(
+                    "Released {WeightKg}kg / {VolumeM3}m3 from vehicle {Plate} after cancelling shipment {TrackingCode}",
+                    weightKg, volumeM3, vehicle.Plate, shipment.TrackingCode);
             }
         }
     }

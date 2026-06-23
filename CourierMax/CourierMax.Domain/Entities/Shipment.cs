@@ -1,4 +1,5 @@
 using CourierMax.Domain.Enums;
+using CourierMax.Domain.Exceptions;
 using CourierMax.Domain.ValueObjects;
 
 namespace CourierMax.Domain.Entities;
@@ -87,7 +88,7 @@ public class Shipment
     public void Assign(int vehicleId, int driverId, string changedBy, decimal totalCost)
     {
         if (Status != ShipmentStatus.CREADO)
-            throw new InvalidOperationException($"Cannot assign shipment in status {Status}. Must be {ShipmentStatus.CREADO}.");
+            throw new ShipmentStateConflictException($"Cannot assign shipment in status {Status}. Must be {ShipmentStatus.CREADO}.");
 
         VehicleId = vehicleId;
         DriverId = driverId;
@@ -98,7 +99,7 @@ public class Shipment
     public void MarkInTransit(string changedBy)
     {
         if (Status != ShipmentStatus.ASIGNADO)
-            throw new InvalidOperationException($"Cannot mark as in transit from status {Status}. Must be {ShipmentStatus.ASIGNADO}.");
+            throw new ShipmentStateConflictException($"Cannot mark as in transit from status {Status}. Must be {ShipmentStatus.ASIGNADO}.");
 
         TransitionTo(ShipmentStatus.EN_TRANSITO, changedBy);
     }
@@ -106,7 +107,7 @@ public class Shipment
     public void Deliver(string changedBy)
     {
         if (Status != ShipmentStatus.EN_TRANSITO)
-            throw new InvalidOperationException($"Cannot deliver shipment in status {Status}. Must be {ShipmentStatus.EN_TRANSITO}.");
+            throw new ShipmentStateConflictException($"Cannot deliver shipment in status {Status}. Must be {ShipmentStatus.EN_TRANSITO}.");
 
         TransitionTo(ShipmentStatus.ENTREGADO, changedBy);
     }
@@ -114,10 +115,10 @@ public class Shipment
     public void Cancel(string reason, string changedBy)
     {
         if (Status == ShipmentStatus.ENTREGADO)
-            throw new InvalidOperationException("Cannot cancel a delivered shipment.");
+            throw new ShipmentStateConflictException("Cannot cancel a delivered shipment.");
 
         if (Status == ShipmentStatus.CANCELADO)
-            throw new InvalidOperationException("Shipment is already cancelled.");
+            throw new ShipmentStateConflictException("Shipment is already cancelled.");
 
         if (string.IsNullOrWhiteSpace(reason) || reason.Trim().Length < 5)
             throw new ArgumentException("Cancellation reason must be at least 5 characters.");
