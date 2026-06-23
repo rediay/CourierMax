@@ -1,12 +1,14 @@
 using CourierMax.Application.DTOs;
 using CourierMax.Domain.Enums;
 using CourierMax.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace CourierMax.Application.Services;
 
 public class CostCalculationService : ICostCalculationService
 {
     private readonly ICityDistanceRepository _cityDistanceRepository;
+    private readonly ILogger<CostCalculationService> _logger;
 
     private const decimal FreeWeightKg = 2m;
     private const decimal WeightSurchargePerKg = 1500m;
@@ -26,9 +28,10 @@ public class CostCalculationService : ICostCalculationService
         [PackageType.Perecedero] = 0.25m
     };
 
-    public CostCalculationService(ICityDistanceRepository cityDistanceRepository)
+    public CostCalculationService(ICityDistanceRepository cityDistanceRepository, ILogger<CostCalculationService> logger)
     {
         _cityDistanceRepository = cityDistanceRepository;
+        _logger = logger;
     }
 
     public async Task<CostEstimateResponse> CalculateAsync(string origin, string destination, decimal weightKg, ServiceType serviceType, PackageType packageType)
@@ -46,6 +49,10 @@ public class CostCalculationService : ICostCalculationService
         var packageSurcharge = Math.Round(subtotal * packageSurchargeRate, 2);
 
         var total = subtotal + packageSurcharge;
+
+        _logger.LogInformation(
+            "Cost calculated for {Origin}->{Destination} ({ServiceType}, {PackageType}, {WeightKg}kg): {TotalCost}",
+            origin, destination, serviceType, packageType, weightKg, total);
 
         return new CostEstimateResponse
         {

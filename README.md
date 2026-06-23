@@ -74,12 +74,22 @@ duplicar try/catch en cada controller:
 - `409 Conflict` — operación incompatible con el estado actual del envío, p. ej. asignar un envío que ya está `ASIGNADO`, o cancelar uno ya `ENTREGADO` (`ShipmentStateConflictException`)
 - `500 Internal Server Error` — cualquier excepción no esperada
 
-**Logging**: además de los `LogWarning`/`LogError` del middleware ante cada
-error, `ShipmentService` registra (`ILogger`, nivel `Information`) los
-eventos de negocio relevantes: creación de envío, asignación a
-vehículo/conductor (con costo calculado), transición de estado, y
-liberación de capacidad del vehículo al cancelar — visibles en consola en
-desarrollo.
+**Logging**: estrategia en capas usando el `ILogger` nativo de .NET (sin
+dependencias externas, alineado con KISS):
+- `RequestLoggingMiddleware` registra **toda** petición HTTP (método, ruta,
+  código de respuesta y duración en ms), envuelta en un *scope* con el
+  `TraceId` de ASP.NET Core para poder correlacionar todos los logs de una
+  misma request.
+- `ExceptionHandlingMiddleware` registra cada error (`LogWarning` para
+  errores de cliente 400/404/409, `LogError` con stack trace para 500).
+- Los servicios de aplicación (`ShipmentService`, `CostCalculationService`,
+  `DriverMetricsService`) registran a nivel `Information` los eventos de
+  negocio relevantes: creación de envío, costo calculado, asignación a
+  vehículo/conductor, transición de estado, liberación de capacidad al
+  cancelar, y generación de reportes.
+- El ruido de EF Core (cada `SELECT`/`INSERT` generado) se silencia a nivel
+  `Warning` en `appsettings.json` (`Microsoft.EntityFrameworkCore`), para que
+  la consola muestre eventos de negocio en vez de SQL crudo.
 
 ---
 

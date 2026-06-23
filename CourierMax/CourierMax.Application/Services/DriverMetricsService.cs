@@ -2,6 +2,7 @@ using CourierMax.Application.DTOs;
 using CourierMax.Domain.Enums;
 using CourierMax.Domain.Interfaces;
 using CourierMax.Domain.Services;
+using Microsoft.Extensions.Logging;
 
 namespace CourierMax.Application.Services;
 
@@ -9,11 +10,16 @@ public class DriverMetricsService : IDriverMetricsService
 {
     private readonly IShipmentRepository _shipmentRepository;
     private readonly IDriverRepository _driverRepository;
+    private readonly ILogger<DriverMetricsService> _logger;
 
-    public DriverMetricsService(IShipmentRepository shipmentRepository, IDriverRepository driverRepository)
+    public DriverMetricsService(
+        IShipmentRepository shipmentRepository,
+        IDriverRepository driverRepository,
+        ILogger<DriverMetricsService> logger)
     {
         _shipmentRepository = shipmentRepository;
         _driverRepository = driverRepository;
+        _logger = logger;
     }
 
     public async Task<DriverEfficiencyReportResponse> GetEfficiencyReportAsync(int driverId)
@@ -47,6 +53,10 @@ public class DriverMetricsService : IDriverMetricsService
         var weightTransportedKg = shipments
             .Where(s => s.Status is ShipmentStatus.ASIGNADO or ShipmentStatus.EN_TRANSITO or ShipmentStatus.ENTREGADO)
             .Sum(s => s.PackageWeight.Kg);
+
+        _logger.LogInformation(
+            "Efficiency report generated for driver {DriverId} ({DriverName}): {TotalAssigned} envíos, {TotalDelivered} entregados",
+            driver.Id, driver.Name, shipments.Count, delivered.Count);
 
         return new DriverEfficiencyReportResponse
         {

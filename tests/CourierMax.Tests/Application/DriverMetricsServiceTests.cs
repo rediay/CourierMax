@@ -5,6 +5,7 @@ using CourierMax.Domain.Entities;
 using CourierMax.Domain.Enums;
 using CourierMax.Domain.Interfaces;
 using CourierMax.Domain.ValueObjects;
+using Microsoft.Extensions.Logging;
 
 namespace CourierMax.Tests.Application.Services;
 
@@ -18,7 +19,8 @@ public class DriverMetricsServiceTests
     {
         _mockShipmentRepo = new Mock<IShipmentRepository>();
         _mockDriverRepo = new Mock<IDriverRepository>();
-        _service = new DriverMetricsService(_mockShipmentRepo.Object, _mockDriverRepo.Object);
+        _service = new DriverMetricsService(
+            _mockShipmentRepo.Object, _mockDriverRepo.Object, Mock.Of<ILogger<DriverMetricsService>>());
     }
 
     private static Shipment CreateAssignedShipment(decimal weightKg, ShipmentStatus finalStatus, DateTime assignedAt, DateTime? deliveredAt = null)

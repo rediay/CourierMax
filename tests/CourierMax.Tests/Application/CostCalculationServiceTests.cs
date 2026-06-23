@@ -4,6 +4,7 @@ using CourierMax.Application.Services;
 using CourierMax.Domain.Entities;
 using CourierMax.Domain.Enums;
 using CourierMax.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace CourierMax.Tests.Application.Services;
 
@@ -15,7 +16,7 @@ public class CostCalculationServiceTests
     public CostCalculationServiceTests()
     {
         _mockRepo = new Mock<ICityDistanceRepository>();
-        _service = new CostCalculationService(_mockRepo.Object);
+        _service = new CostCalculationService(_mockRepo.Object, Mock.Of<ILogger<CostCalculationService>>());
     }
 
     [Fact]
