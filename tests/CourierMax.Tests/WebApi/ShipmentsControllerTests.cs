@@ -91,4 +91,39 @@ public class ShipmentsControllerTests
 
         result.Should().BeOfType<NotFoundObjectResult>();
     }
+
+    [Fact]
+    public async Task Assign_ValidRequest_ReturnsOk()
+    {
+        var request = new AssignRequest { VehicleId = 1, DriverId = 2, ChangedBy = "operator" };
+        var expectedResponse = new ShipmentResponse
+        {
+            Id = 1,
+            TrackingCode = "CM-12345678",
+            Status = "ASIGNADO",
+            VehicleId = 1,
+            DriverId = 2
+        };
+
+        _mockService.Setup(s => s.AssignAsync(1, request))
+            .ReturnsAsync(expectedResponse);
+
+        var result = await _controller.Assign(1, request);
+
+        var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+        okResult.Value.Should().Be(expectedResponse);
+    }
+
+    [Fact]
+    public async Task Assign_ServiceThrowsKeyNotFound_PropagatesException()
+    {
+        var request = new AssignRequest { VehicleId = 1, DriverId = 2, ChangedBy = "operator" };
+
+        _mockService.Setup(s => s.AssignAsync(999, request))
+            .ThrowsAsync(new KeyNotFoundException("Shipment with id 999 not found."));
+
+        Func<Task> act = () => _controller.Assign(999, request);
+
+        await act.Should().ThrowAsync<KeyNotFoundException>();
+    }
 }

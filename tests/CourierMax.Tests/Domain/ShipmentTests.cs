@@ -35,4 +35,43 @@ public class ShipmentTests
         shipment.Destination.Should().Be("Medellín");
         shipment.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
     }
+
+    [Fact]
+    public void Assign_ValidData_SetsPropertiesAndTransitionsToAsignado()
+    {
+        var shipment = CreateValidShipment();
+        var vehicleId = 1;
+        var driverId = 2;
+
+        shipment.Assign(vehicleId, driverId, "operator");
+
+        shipment.VehicleId.Should().Be(vehicleId);
+        shipment.DriverId.Should().Be(driverId);
+        shipment.Status.Should().Be(ShipmentStatus.ASIGNADO);
+        shipment.StatusHistories.Should().Contain(h =>
+            h.PreviousStatus == ShipmentStatus.CREADO &&
+            h.NewStatus == ShipmentStatus.ASIGNADO &&
+            h.ChangedBy == "operator");
+    }
+
+    [Fact]
+    public void Assign_NotInCreado_ThrowsInvalidOperationException()
+    {
+        var shipment = CreateValidShipment();
+        shipment.Assign(1, 2, "operator");
+
+        Action act = () => shipment.Assign(3, 4, "operator");
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*Cannot assign*ASIGNADO*CREADO*");
+    }
+
+    private static Shipment CreateValidShipment()
+    {
+        return new Shipment(
+            "Juan Perez", new Phone("3001234567"), new Address("Calle 123"),
+            "Maria Lopez", new Phone("3102345678"), new Address("Carrera 456"),
+            new Weight(5), new Dimensions(30, 20, 10),
+            PackageType.Paquete, ServiceType.Estandar, "Bogotá", "Medellín");
+    }
 }

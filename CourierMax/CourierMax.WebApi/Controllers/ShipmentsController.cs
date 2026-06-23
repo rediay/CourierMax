@@ -36,6 +36,16 @@ public class ShipmentsController : ControllerBase
         return Ok(shipment);
     }
 
+    [HttpPost("{id}/assign")]
+    [ProducesResponseType(typeof(ShipmentResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Assign(int id, [FromBody] AssignRequest request)
+    {
+        var shipment = await _shipmentService.AssignAsync(id, request);
+        return Ok(shipment);
+    }
+
     [HttpPatch("{id}/status")]
     [ProducesResponseType(typeof(ShipmentResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

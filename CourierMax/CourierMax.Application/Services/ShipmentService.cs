@@ -41,6 +41,18 @@ public class ShipmentService : IShipmentService
         return shipment is null ? null : MapToResponse(shipment);
     }
 
+    public async Task<ShipmentResponse> AssignAsync(int id, AssignRequest request)
+    {
+        var shipment = await _shipmentRepository.GetByIdAsync(id);
+        if (shipment is null)
+            throw new KeyNotFoundException($"Shipment with id {id} not found.");
+
+        shipment.Assign(request.VehicleId, request.DriverId, request.ChangedBy);
+
+        await _shipmentRepository.UpdateAsync(shipment);
+        return MapToResponse(shipment);
+    }
+
     public async Task<ShipmentResponse> UpdateStatusAsync(int id, UpdateStatusRequest request)
     {
         var shipment = await _shipmentRepository.GetByIdAsync(id);
@@ -108,6 +120,8 @@ public class ShipmentService : IShipmentService
             Origin = shipment.Origin,
             Destination = shipment.Destination,
             Status = shipment.Status.ToString(),
+            VehicleId = shipment.VehicleId,
+            DriverId = shipment.DriverId,
             TotalCost = shipment.TotalCost,
             CreatedAt = shipment.CreatedAt
         };

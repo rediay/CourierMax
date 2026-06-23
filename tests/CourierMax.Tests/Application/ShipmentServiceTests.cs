@@ -84,4 +84,39 @@ public class ShipmentServiceTests
 
         result.Should().BeNull();
     }
+
+    [Fact]
+    public async Task AssignAsync_ExistingShipment_AssignsAndReturnsResponse()
+    {
+        var shipment = new Shipment(
+            "Juan Perez", new Phone("3001234567"), new Address("Calle 123"),
+            "Maria Lopez", new Phone("3102345678"), new Address("Carrera 456"),
+            new Weight(5), new Dimensions(30, 20, 10),
+            PackageType.Paquete, ServiceType.Estandar, "Bogotá", "Medellín");
+        var request = new AssignRequest { VehicleId = 1, DriverId = 2, ChangedBy = "operator" };
+
+        _mockRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(shipment);
+        _mockRepo.Setup(r => r.UpdateAsync(It.IsAny<Shipment>())).Returns(Task.CompletedTask);
+
+        var result = await _service.AssignAsync(1, request);
+
+        result.Should().NotBeNull();
+        result.Status.Should().Be("ASIGNADO");
+        result.VehicleId.Should().Be(1);
+        result.DriverId.Should().Be(2);
+        _mockRepo.Verify(r => r.UpdateAsync(shipment), Times.Once);
+    }
+
+    [Fact]
+    public async Task AssignAsync_NonExistingShipment_ThrowsKeyNotFoundException()
+    {
+        var request = new AssignRequest { VehicleId = 1, DriverId = 2, ChangedBy = "operator" };
+
+        _mockRepo.Setup(r => r.GetByIdAsync(999)).ReturnsAsync((Shipment?)null);
+
+        Func<Task> act = () => _service.AssignAsync(999, request);
+
+        await act.Should().ThrowAsync<KeyNotFoundException>()
+            .WithMessage("*Shipment with id 999 not found*");
+    }
 }

@@ -80,7 +80,16 @@ public class ShipmentConfiguration : IEntityTypeConfiguration<Shipment>
             .IsRequired();
 
         builder.Property(s => s.VehicleId);
+        builder.HasOne<Vehicle>()
+            .WithMany()
+            .HasForeignKey(s => s.VehicleId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         builder.Property(s => s.DriverId);
+        builder.HasOne<Driver>()
+            .WithMany()
+            .HasForeignKey(s => s.DriverId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         builder.Property(s => s.TotalCost)
             .HasColumnType("decimal(18,2)");
