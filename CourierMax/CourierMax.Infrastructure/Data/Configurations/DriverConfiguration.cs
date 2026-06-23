@@ -18,5 +18,13 @@ public class DriverConfiguration : IEntityTypeConfiguration<Driver>
         builder.Property(d => d.IsActive).IsRequired();
         builder.Property(d => d.CreatedAt).IsRequired();
         builder.Property(d => d.UpdatedAt);
+
+        var seedDate = new DateTime(2026, 6, 10, 0, 0, 0, DateTimeKind.Utc);
+
+        builder.HasData(
+            new { Id = 1, Name = "Juan Pérez", Phone = (string?)null, Email = (string?)null, IsActive = true, CreatedAt = seedDate, UpdatedAt = (DateTime?)null },
+            new { Id = 2, Name = "María López", Phone = (string?)null, Email = (string?)null, IsActive = true, CreatedAt = seedDate, UpdatedAt = (DateTime?)null },
+            new { Id = 3, Name = "Carlos Ruiz", Phone = (string?)null, Email = (string?)null, IsActive = true, CreatedAt = seedDate, UpdatedAt = (DateTime?)null }
+        );
     }
 }

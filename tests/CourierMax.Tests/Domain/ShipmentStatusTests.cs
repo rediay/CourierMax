@@ -27,7 +27,7 @@ public class ShipmentStatusTests
     public void Assign_FromCREADO_SetsASIGNADO()
     {
         var shipment = CreateValidShipment();
-        shipment.Assign(1, 1, "operator1");
+        shipment.Assign(1, 1, "operator1", 0);
         shipment.Status.Should().Be(ShipmentStatus.ASIGNADO);
         shipment.VehicleId.Should().Be(1);
         shipment.DriverId.Should().Be(1);
@@ -37,8 +37,8 @@ public class ShipmentStatusTests
     public void Assign_FromNonCREADO_Throws()
     {
         var shipment = CreateValidShipment();
-        shipment.Assign(1, 1, "operator1");
-        Action act = () => shipment.Assign(1, 1, "operator2");
+        shipment.Assign(1, 1, "operator1", 0);
+        Action act = () => shipment.Assign(1, 1, "operator2", 0);
         act.Should().Throw<InvalidOperationException>();
     }
 
@@ -46,7 +46,7 @@ public class ShipmentStatusTests
     public void MarkInTransit_FromASIGNADO_SetsEN_TRANSITO()
     {
         var shipment = CreateValidShipment();
-        shipment.Assign(1, 1, "op1");
+        shipment.Assign(1, 1, "op1", 0);
         shipment.MarkInTransit("op1");
         shipment.Status.Should().Be(ShipmentStatus.EN_TRANSITO);
     }
@@ -63,7 +63,7 @@ public class ShipmentStatusTests
     public void Deliver_FromEN_TRANSITO_SetsENTREGADO()
     {
         var shipment = CreateValidShipment();
-        shipment.Assign(1, 1, "op1");
+        shipment.Assign(1, 1, "op1", 0);
         shipment.MarkInTransit("op1");
         shipment.Deliver("op1");
         shipment.Status.Should().Be(ShipmentStatus.ENTREGADO);
@@ -89,7 +89,7 @@ public class ShipmentStatusTests
     public void Cancel_FromASIGNADO_SetsCANCELADO()
     {
         var shipment = CreateValidShipment();
-        shipment.Assign(1, 1, "op1");
+        shipment.Assign(1, 1, "op1", 0);
         shipment.Cancel("Client requested cancellation", "op1");
         shipment.Status.Should().Be(ShipmentStatus.CANCELADO);
     }
@@ -98,7 +98,7 @@ public class ShipmentStatusTests
     public void Cancel_FromEN_TRANSITO_SetsCANCELADO()
     {
         var shipment = CreateValidShipment();
-        shipment.Assign(1, 1, "op1");
+        shipment.Assign(1, 1, "op1", 0);
         shipment.MarkInTransit("op1");
         shipment.Cancel("Vehicle breakdown", "op1");
         shipment.Status.Should().Be(ShipmentStatus.CANCELADO);
@@ -108,7 +108,7 @@ public class ShipmentStatusTests
     public void Cancel_FromENTREGADO_Throws()
     {
         var shipment = CreateValidShipment();
-        shipment.Assign(1, 1, "op1");
+        shipment.Assign(1, 1, "op1", 0);
         shipment.MarkInTransit("op1");
         shipment.Deliver("op1");
         Action act = () => shipment.Cancel("Too late", "op1");
@@ -136,7 +136,7 @@ public class ShipmentStatusTests
     {
         var shipment = CreateValidShipment();
         shipment.Status.Should().Be(ShipmentStatus.CREADO);
-        shipment.Assign(1, 1, "op1");
+        shipment.Assign(1, 1, "op1", 0);
         shipment.Status.Should().Be(ShipmentStatus.ASIGNADO);
         shipment.MarkInTransit("op1");
         shipment.Status.Should().Be(ShipmentStatus.EN_TRANSITO);
@@ -148,7 +148,7 @@ public class ShipmentStatusTests
     public void StatusHistory_RecordsAllTransitions()
     {
         var shipment = CreateValidShipment();
-        shipment.Assign(1, 1, "op1");
+        shipment.Assign(1, 1, "op1", 0);
         shipment.MarkInTransit("op1");
         shipment.Deliver("op1");
 

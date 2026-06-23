@@ -36,6 +36,16 @@ public class ShipmentsController : ControllerBase
         return Ok(shipment);
     }
 
+    [HttpGet("{trackingCode}/cost")]
+    [ProducesResponseType(typeof(CostEstimateResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetCostEstimate(string trackingCode)
+    {
+        var estimate = await _shipmentService.GetCostEstimateAsync(trackingCode);
+        return Ok(estimate);
+    }
+
     [HttpPost("{id}/assign")]
     [ProducesResponseType(typeof(ShipmentResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -63,5 +73,17 @@ public class ShipmentsController : ControllerBase
     {
         var history = await _shipmentService.GetHistoryAsync(id);
         return Ok(history);
+    }
+
+    [HttpGet("overdue")]
+    [ProducesResponseType(typeof(IEnumerable<ShipmentResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetOverdue([FromQuery] DateTime from, [FromQuery] DateTime to)
+    {
+        if (to < from)
+            return BadRequest(new { error = "'to' must be greater than or equal to 'from'." });
+
+        var overdueShipments = await _shipmentService.GetOverdueShipmentsAsync(from, to);
+        return Ok(overdueShipments);
     }
 }

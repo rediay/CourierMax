@@ -30,5 +30,13 @@ public class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
             .WithOne(d => d.Vehicle)
             .HasForeignKey<Vehicle>(v => v.DriverId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        var seedDate = new DateTime(2026, 6, 10, 0, 0, 0, DateTimeKind.Utc);
+
+        builder.HasData(
+            new { Id = 1, Plate = "ABC-123", DriverId = (int?)1, MaxWeightKg = 500m, MaxVolumeM3 = 10m, CurrentWeightKg = 0m, CurrentVolumeM3 = 0m, CreatedAt = seedDate, UpdatedAt = (DateTime?)null },
+            new { Id = 2, Plate = "DEF-456", DriverId = (int?)2, MaxWeightKg = 300m, MaxVolumeM3 = 6m, CurrentWeightKg = 0m, CurrentVolumeM3 = 0m, CreatedAt = seedDate, UpdatedAt = (DateTime?)null },
+            new { Id = 3, Plate = "GHI-789", DriverId = (int?)3, MaxWeightKg = 800m, MaxVolumeM3 = 15m, CurrentWeightKg = 0m, CurrentVolumeM3 = 0m, CreatedAt = seedDate, UpdatedAt = (DateTime?)null }
+        );
     }
 }

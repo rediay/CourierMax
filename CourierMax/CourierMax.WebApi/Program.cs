@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using CourierMax.Application.Services;
 using CourierMax.Domain.Interfaces;
@@ -7,7 +8,8 @@ using CourierMax.WebApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -17,7 +19,10 @@ builder.Services.AddDbContext<CourierMaxDbContext>(options =>
 builder.Services.AddScoped<IShipmentRepository, ShipmentRepository>();
 builder.Services.AddScoped<IDriverRepository, DriverRepository>();
 builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+builder.Services.AddScoped<ICityDistanceRepository, CityDistanceRepository>();
+builder.Services.AddScoped<ICostCalculationService, CostCalculationService>();
 builder.Services.AddScoped<IShipmentService, ShipmentService>();
+builder.Services.AddScoped<IDriverMetricsService, DriverMetricsService>();
 
 var app = builder.Build();
 

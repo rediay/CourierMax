@@ -13,6 +13,7 @@ public class CourierMaxDbContext : DbContext
     public DbSet<ShipmentStatusHistory> ShipmentStatusHistories => Set<ShipmentStatusHistory>();
     public DbSet<Driver> Drivers => Set<Driver>();
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
+    public DbSet<CityDistance> CityDistances => Set<CityDistance>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

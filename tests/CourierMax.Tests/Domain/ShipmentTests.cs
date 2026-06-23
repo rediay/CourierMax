@@ -43,7 +43,7 @@ public class ShipmentTests
         var vehicleId = 1;
         var driverId = 2;
 
-        shipment.Assign(vehicleId, driverId, "operator");
+        shipment.Assign(vehicleId, driverId, "operator", 12500);
 
         shipment.VehicleId.Should().Be(vehicleId);
         shipment.DriverId.Should().Be(driverId);
@@ -58,12 +58,22 @@ public class ShipmentTests
     public void Assign_NotInCreado_ThrowsInvalidOperationException()
     {
         var shipment = CreateValidShipment();
-        shipment.Assign(1, 2, "operator");
+        shipment.Assign(1, 2, "operator", 0);
 
-        Action act = () => shipment.Assign(3, 4, "operator");
+        Action act = () => shipment.Assign(3, 4, "operator", 0);
 
         act.Should().Throw<InvalidOperationException>()
             .WithMessage("*Cannot assign*ASIGNADO*CREADO*");
+    }
+
+    [Fact]
+    public void Assign_WithTotalCost_SetsTotalCost()
+    {
+        var shipment = CreateValidShipment();
+
+        shipment.Assign(1, 2, "operator", 15000);
+
+        shipment.TotalCost.Should().Be(15000);
     }
 
     private static Shipment CreateValidShipment()

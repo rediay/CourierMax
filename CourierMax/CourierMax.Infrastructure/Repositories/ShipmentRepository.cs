@@ -35,6 +35,22 @@ public class ShipmentRepository : IShipmentRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Shipment>> GetByDriverIdAsync(int driverId)
+    {
+        return await _context.Shipments
+            .Include(s => s.StatusHistories)
+            .Where(s => s.DriverId == driverId)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Shipment>> GetByCreatedDateRangeAsync(DateTime from, DateTime to)
+    {
+        return await _context.Shipments
+            .Include(s => s.StatusHistories)
+            .Where(s => s.CreatedAt >= from && s.CreatedAt <= to)
+            .ToListAsync();
+    }
+
     public async Task AddAsync(Shipment shipment)
     {
         await _context.Shipments.AddAsync(shipment);

@@ -95,7 +95,7 @@ public class ShipmentsControllerTests
     [Fact]
     public async Task Assign_ValidRequest_ReturnsOk()
     {
-        var request = new AssignRequest { VehicleId = 1, DriverId = 2, ChangedBy = "operator" };
+        var request = new AssignRequest { DriverId = 2, ChangedBy = "operator" };
         var expectedResponse = new ShipmentResponse
         {
             Id = 1,
@@ -117,12 +117,44 @@ public class ShipmentsControllerTests
     [Fact]
     public async Task Assign_ServiceThrowsKeyNotFound_PropagatesException()
     {
-        var request = new AssignRequest { VehicleId = 1, DriverId = 2, ChangedBy = "operator" };
+        var request = new AssignRequest { DriverId = 2, ChangedBy = "operator" };
 
         _mockService.Setup(s => s.AssignAsync(999, request))
             .ThrowsAsync(new KeyNotFoundException("Shipment with id 999 not found."));
 
         Func<Task> act = () => _controller.Assign(999, request);
+
+        await act.Should().ThrowAsync<KeyNotFoundException>();
+    }
+
+    [Fact]
+    public async Task GetCostEstimate_ExistingShipment_ReturnsOk()
+    {
+        var estimate = new CostEstimateResponse
+        {
+            Origin = "Bogotá",
+            Destination = "Medellín",
+            DistanceKm = 480,
+            DistanceFee = 12000,
+            TotalCost = 13000
+        };
+
+        _mockService.Setup(s => s.GetCostEstimateAsync("CM-12345678"))
+            .ReturnsAsync(estimate);
+
+        var result = await _controller.GetCostEstimate("CM-12345678");
+
+        var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+        okResult.Value.Should().Be(estimate);
+    }
+
+    [Fact]
+    public async Task GetCostEstimate_ServiceThrowsKeyNotFound_PropagatesException()
+    {
+        _mockService.Setup(s => s.GetCostEstimateAsync("CM-99999999"))
+            .ThrowsAsync(new KeyNotFoundException("not found"));
+
+        Func<Task> act = () => _controller.GetCostEstimate("CM-99999999");
 
         await act.Should().ThrowAsync<KeyNotFoundException>();
     }

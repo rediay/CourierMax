@@ -9,4 +9,6 @@ public interface IShipmentService
     Task<ShipmentResponse> AssignAsync(int id, AssignRequest request);
     Task<ShipmentResponse> UpdateStatusAsync(int id, UpdateStatusRequest request);
     Task<IEnumerable<ShipmentHistoryResponse>> GetHistoryAsync(int id);
+    Task<CostEstimateResponse> GetCostEstimateAsync(string trackingCode);
+    Task<IEnumerable<ShipmentResponse>> GetOverdueShipmentsAsync(DateTime from, DateTime to);
 }

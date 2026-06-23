@@ -7,6 +7,8 @@ public interface IShipmentRepository
     Task<Shipment?> GetByIdAsync(int id);
     Task<Shipment?> GetByTrackingCodeAsync(string trackingCode);
     Task<IEnumerable<Shipment>> GetAllAsync();
+    Task<IEnumerable<Shipment>> GetByDriverIdAsync(int driverId);
+    Task<IEnumerable<Shipment>> GetByCreatedDateRangeAsync(DateTime from, DateTime to);
     Task AddAsync(Shipment shipment);
     Task UpdateAsync(Shipment shipment);
     Task<bool> TrackingCodeExistsAsync(string trackingCode);

@@ -62,9 +62,10 @@ public class Shipment
         PackageType packageType,
         ServiceType serviceType,
         string origin,
-        string destination)
+        string destination,
+        TrackingCode? trackingCode = null)
     {
-        TrackingCode = TrackingCode.Generate();
+        TrackingCode = trackingCode ?? TrackingCode.Generate();
         SenderName = senderName;
         SenderPhone = senderPhone;
         SenderAddress = senderAddress;
@@ -83,13 +84,14 @@ public class Shipment
         _statusHistories.Add(new ShipmentStatusHistory(0, null, ShipmentStatus.CREADO, "system"));
     }
 
-    public void Assign(int vehicleId, int driverId, string changedBy)
+    public void Assign(int vehicleId, int driverId, string changedBy, decimal totalCost)
     {
         if (Status != ShipmentStatus.CREADO)
             throw new InvalidOperationException($"Cannot assign shipment in status {Status}. Must be {ShipmentStatus.CREADO}.");
 
         VehicleId = vehicleId;
         DriverId = driverId;
+        TotalCost = totalCost;
         TransitionTo(ShipmentStatus.ASIGNADO, changedBy);
     }
 

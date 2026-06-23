@@ -4,6 +4,7 @@ using CourierMax.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CourierMax.Infrastructure.Migrations
 {
     [DbContext(typeof(CourierMaxDbContext))]
-    partial class CourierMaxDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260623015241_AddCityDistances")]
+    partial class AddCityDistances
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,56 +55,6 @@ namespace CourierMax.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("CityDistances", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Destination = "Medellín",
-                            DistanceFee = 12000m,
-                            DistanceKm = 480m,
-                            Origin = "Bogotá"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Destination = "Cali",
-                            DistanceFee = 9000m,
-                            DistanceKm = 360m,
-                            Origin = "Bogotá"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Destination = "Barranquilla",
-                            DistanceFee = 20000m,
-                            DistanceKm = 950m,
-                            Origin = "Bogotá"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Destination = "Cali",
-                            DistanceFee = 8000m,
-                            DistanceKm = 310m,
-                            Origin = "Medellín"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Destination = "Barranquilla",
-                            DistanceFee = 15000m,
-                            DistanceKm = 650m,
-                            Origin = "Medellín"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Destination = "Barranquilla",
-                            DistanceFee = 18000m,
-                            DistanceKm = 900m,
-                            Origin = "Cali"
-                        });
                 });
 
             modelBuilder.Entity("CourierMax.Domain.Entities.Driver", b =>
@@ -137,29 +90,6 @@ namespace CourierMax.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Drivers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 6, 10, 0, 0, 0, 0, DateTimeKind.Utc),
-                            IsActive = true,
-                            Name = "Juan Pérez"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(2026, 6, 10, 0, 0, 0, 0, DateTimeKind.Utc),
-                            IsActive = true,
-                            Name = "María López"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedAt = new DateTime(2026, 6, 10, 0, 0, 0, 0, DateTimeKind.Utc),
-                            IsActive = true,
-                            Name = "Carlos Ruiz"
-                        });
                 });
 
             modelBuilder.Entity("CourierMax.Domain.Entities.Shipment", b =>
@@ -334,41 +264,6 @@ namespace CourierMax.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Vehicles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2026, 6, 10, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CurrentVolumeM3 = 0m,
-                            CurrentWeightKg = 0m,
-                            DriverId = 1,
-                            MaxVolumeM3 = 10m,
-                            MaxWeightKg = 500m,
-                            Plate = "ABC-123"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(2026, 6, 10, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CurrentVolumeM3 = 0m,
-                            CurrentWeightKg = 0m,
-                            DriverId = 2,
-                            MaxVolumeM3 = 6m,
-                            MaxWeightKg = 300m,
-                            Plate = "DEF-456"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedAt = new DateTime(2026, 6, 10, 0, 0, 0, 0, DateTimeKind.Utc),
-                            CurrentVolumeM3 = 0m,
-                            CurrentWeightKg = 0m,
-                            DriverId = 3,
-                            MaxVolumeM3 = 15m,
-                            MaxWeightKg = 800m,
-                            Plate = "GHI-789"
-                        });
                 });
 
             modelBuilder.Entity("CourierMax.Domain.Entities.Shipment", b =>
