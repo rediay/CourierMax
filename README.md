@@ -16,6 +16,7 @@ seniority (ver [enunciado](../enunciado-prueba-dotnet-seniority.md)).
 | Runtime / Framework | .NET 9.0, ASP.NET Core Web API |
 | Persistencia | Entity Framework Core 9.0 (Code-First + Migrations), SQL Server |
 | Documentación de API | Swagger / OpenAPI (`Swashbuckle`) |
+| Logging | Serilog (consola + archivo rotado por día) |
 | Pruebas | xUnit, Moq, FluentAssertions |
 | Arquitectura | Clean Architecture (Domain / Application / Infrastructure / WebApi) |
 
@@ -74,22 +75,27 @@ duplicar try/catch en cada controller:
 - `409 Conflict` — operación incompatible con el estado actual del envío, p. ej. asignar un envío que ya está `ASIGNADO`, o cancelar uno ya `ENTREGADO` (`ShipmentStateConflictException`)
 - `500 Internal Server Error` — cualquier excepción no esperada
 
-**Logging**: estrategia en capas usando el `ILogger` nativo de .NET (sin
-dependencias externas, alineado con KISS):
+**Logging**: estrategia en capas sobre **Serilog** (consola + archivo),
+configurada desde `appsettings.json` sin tocar código si se necesita
+cambiar un nivel o agregar un sink:
 - `RequestLoggingMiddleware` registra **toda** petición HTTP (método, ruta,
   código de respuesta y duración en ms), envuelta en un *scope* con el
   `TraceId` de ASP.NET Core para poder correlacionar todos los logs de una
   misma request.
 - `ExceptionHandlingMiddleware` registra cada error (`LogWarning` para
-  errores de cliente 400/404/409, `LogError` con stack trace para 500).
+  errores de cliente 400/404/409, `LogError` con stack trace completo para 500).
 - Los servicios de aplicación (`ShipmentService`, `CostCalculationService`,
   `DriverMetricsService`) registran a nivel `Information` los eventos de
   negocio relevantes: creación de envío, costo calculado, asignación a
   vehículo/conductor, transición de estado, liberación de capacidad al
   cancelar, y generación de reportes.
 - El ruido de EF Core (cada `SELECT`/`INSERT` generado) se silencia a nivel
-  `Warning` en `appsettings.json` (`Microsoft.EntityFrameworkCore`), para que
-  la consola muestre eventos de negocio en vez de SQL crudo.
+  `Warning` (`Microsoft.EntityFrameworkCore`), para que los logs muestren
+  eventos de negocio en vez de SQL crudo.
+- **Persistencia en disco**: además de la consola, todo se escribe en
+  `logs/couriermax-YYYYMMDD.log` (un archivo por día, se conservan los
+  últimos 14), para poder auditar errores después de que la consola ya se
+  cerró — la carpeta `logs/` está en `.gitignore`, no se versiona.
 
 ---
 

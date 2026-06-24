@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using CourierMax.Application.Services;
 using CourierMax.Domain.Interfaces;
 using CourierMax.Infrastructure.Data;
@@ -8,7 +9,10 @@ using CourierMax.WebApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Logging.AddSimpleConsole(options => options.IncludeScopes = true);
+builder.Host.UseSerilog((context, loggerConfig) =>
+    loggerConfig
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.FromLogContext());
 
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
